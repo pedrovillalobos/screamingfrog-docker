@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/with-contenv bash
 # tailscaled in userspace-networking mode: no /dev/net/tun, no NET_ADMIN.
 # It exposes a local outbound HTTP proxy (port 1056) and SOCKS5 (1055) —
 # only traffic the SEO Spider sends through the proxy leaves via the

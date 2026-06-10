@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<CommunityApplications>
+  <Profile>
+    Unofficial Docker packaging of Screaming Frog SEO Spider for Unraid: the full GUI in your browser (KasmVNC), the native MCP server (v24+) exposed for Claude Code / Cursor / any MCP client, and optional Tailscale userspace egress so crawls exit through a fixed-IP exit node. The image does not bundle or redistribute Screaming Frog — the official installer is downloaded from screamingfrog.co.uk at container start, and a paid licence (purchased from Screaming Frog Ltd) is required for crawls over 500 URLs and for MCP/headless features. Source, documentation and issue tracker on GitHub.
+  </Profile>
+  <Icon>https://raw.githubusercontent.com/pedrovillalobos/screamingfrog-docker/main/icon.png</Icon>
+  <WebPage>https://github.com/pedrovillalobos/screamingfrog-docker</WebPage>
+  <!-- <Forum>URL_DA_THREAD_NO_FORUM_UNRAID</Forum> -->
+</CommunityApplications>

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/with-contenv bash
 # The native SF MCP server (v24+) listens on 127.0.0.1:11435 inside the
 # container. This relay exposes it on 0.0.0.0:11436 so the port can be
 # published to the LAN. Retry loop: the MCP endpoint only exists after the

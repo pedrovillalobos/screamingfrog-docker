@@ -2,7 +2,7 @@
 <Container version="2">
   <Name>ScreamingFrog-SEO-Spider</Name>
   <Repository>ghcr.io/pedrovillalobos/screamingfrog-docker:latest</Repository>
-  <Registry>https://github.com/pedrovillalobos/screamingfrog-docker/pkgs/container/screamingfrog-docker</Registry>
+  <Registry>https://ghcr.io</Registry>
   <Network>bridge</Network>
   <Shell>bash</Shell>
   <Privileged>false</Privileged>
@@ -23,17 +23,24 @@ IMPORTANT: do NOT use Unraid's built-in per-container Tailscale toggle with an E
 
 Security: the GUI and MCP ports have no built-in authentication — keep them on your LAN/tailnet only, never expose them to the internet.
   </Overview>
+  <Description>
+Screaming Frog SEO Spider (UNOFFICIAL) in your browser via KasmVNC, with the native MCP server (v24+) exposed for Claude Code / Cursor / any MCP client, and optional Tailscale userspace egress so crawl traffic exits through a fixed-IP exit node while the GUI and MCP stay on your LAN.
+
+A PAID Screaming Frog licence is required for crawls over 500 URLs and for MCP/headless features. This image does NOT bundle Screaming Frog: the official installer is downloaded from screamingfrog.co.uk on first start (SF_VERSION sets the minimum version; the in-app updater also works). Licence, configurations and crawls persist in appdata across restarts, re-creations and updates.
+
+Full documentation: https://github.com/pedrovillalobos/screamingfrog-docker
+  </Description>
   <Category>Tools: Productivity:</Category>
-  <WebUI>http://[IP]:[PORT:3000]/</WebUI>
-  <TemplateURL/>
+  <WebUI>https://[IP]:[PORT:3001]/</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/pedrovillalobos/screamingfrog-docker/main/unraid-template/screamingfrog-seo-spider.xml</TemplateURL>
   <Icon>https://raw.githubusercontent.com/pedrovillalobos/screamingfrog-docker/main/icon.png</Icon>
   <ExtraParams>--shm-size=2g --security-opt seccomp=unconfined</ExtraParams>
   <DonateText/>
   <DonateLink/>
 
-  <Config Name="WebUI (KasmVNC)" Target="3000" Default="3000" Mode="tcp"
-          Description="Screaming Frog GUI in the browser (HTTP)"
-          Type="Port" Display="always" Required="true" Mask="false">3000</Config>
+  <Config Name="WebUI (HTTPS)" Target="3001" Default="3001" Mode="tcp"
+          Description="Screaming Frog GUI in the browser. HTTPS with a self-signed certificate — accept the browser warning on first access. (The web client requires a secure context and refuses plain HTTP.)"
+          Type="Port" Display="always" Required="true" Mask="false">3001</Config>
 
   <Config Name="MCP Server" Target="11436" Default="11435" Mode="tcp"
           Description="Native SEO Spider MCP server (http://IP:port/mcp)"

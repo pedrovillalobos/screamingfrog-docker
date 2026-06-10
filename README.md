@@ -3,7 +3,7 @@
 [Screaming Frog SEO Spider](https://www.screamingfrog.co.uk/seo-spider/) running
 in your browser (linuxserver.io Webtop + KasmVNC), with:
 
-- **Full GUI in the browser** — identical to the desktop app, at `http://HOST:3000`
+- **Full GUI in the browser** — identical to the desktop app, at `https://HOST:3001` (self-signed certificate)
 - **Native MCP server (v24+) exposed** to your LAN/tailnet for Claude Code,
   Claude Desktop, Cursor, or any MCP-compatible client
 - **Optional Tailscale egress** (userspace, installed at runtime only if you
@@ -48,7 +48,7 @@ internet.**
 1. Search for **ScreamingFrog-SEO-Spider** in Apps (or add the template from
    [`unraid-template/`](unraid-template/)).
 2. The install screen pre-fills everything; adjust if needed:
-   - **WebUI port** (default `3000`) and **MCP port** (default `11435`)
+   - **WebUI port** (default `3001`, HTTPS) and **MCP port** (default `11435`)
    - **Appdata**: default `/mnt/user/appdata/screamingfrog`. **Performance
      tip**: if your appdata share lives on a cache pool, use the direct disk
      path instead (e.g. `/mnt/cache/appdata/screamingfrog`). Screaming Frog
@@ -57,7 +57,10 @@ internet.**
      the "deleting unused backups" step at app startup.
    - **SF_VERSION** (minimum version, see [Updating](#updating-screaming-frog))
 3. Apply. First start downloads the official installer (~900 MB), then the GUI
-   is available at `http://SERVER_IP:3000` with the SEO Spider already open.
+   is available at `https://SERVER_IP:3001` — the certificate is self-signed,
+   so accept the browser warning. The SEO Spider opens automatically.
+   (Plain HTTP on container port 3000 is refused by the web client, which
+   requires a secure context.)
 4. Enter your licence, then set `File > Settings > Storage Mode` to
    **Database Storage** and adjust `File > Settings > Memory Allocation`
    (see [Memory](#memory)).
@@ -87,7 +90,7 @@ services:
       - TS_ENABLED=false       # see "Tailscale" below before enabling
       - TS_EXIT_NODE=
     ports:
-      - "3000:3000"            # GUI (KasmVNC, HTTP)
+      - "3001:3001"            # GUI (HTTPS, self-signed cert)
       - "11435:11436"          # MCP
     volumes:
       - ./appdata:/config      # licence, configs, crawls, exports
@@ -97,7 +100,7 @@ services:
     restart: unless-stopped
 ```
 
-`docker compose up -d`, then open `http://HOST:3000`.
+`docker compose up -d`, then open `https://HOST:3001` (accept the self-signed certificate warning).
 
 ## Environment variables
 
@@ -169,7 +172,7 @@ the session persists in `/config/tailscale`.
    ```
    It must return your exit node's public IP.
 4. In the SEO Spider: `Config > System > Proxy` → host `localhost`, port `1056`.
-5. Remote access over your tailnet: `http://TAILSCALE_IP:3000` (GUI) and
+5. Remote access over your tailnet: `https://TAILSCALE_IP:3001` (GUI) and
    `http://TAILSCALE_IP:11436/mcp` (MCP).
 
 State persists in `/config/tailscale`. Because Tailscale is installed at
@@ -195,6 +198,22 @@ crawls and exports in `/config` are never touched.
 Put your `.seospiderconfig` files in `/config/sf-configs`. Load them via the
 GUI (`File > Configuration > Load`), via headless CLI (`--config`), or
 reference them in MCP crawl tools.
+
+## Troubleshooting
+
+**dbus "Permission denied" messages in the container log** (`org.freedesktop.login1`
+/ `org.freedesktop.PolicyKit1`): harmless and expected in linuxserver Webtop
+containers — there is no systemd/logind inside the container and the session
+runs as an unprivileged user. They are usually the last visible log lines
+while slower, silent work happens (the ~1 GB package unpack on first install,
+and the SEO Spider's own startup, which does not write to the container log).
+
+**Slow first start / start after re-creation**: the install unpacks ~1 GB into
+the Docker image filesystem; on slower SSDs this takes a few minutes. Use
+`docker logs -t <container>` to see timestamps and find where time is actually
+spent. App startup itself ("deleting unused backups", instance init) is
+fastest when `/config` is on a fast disk — on Unraid, prefer a direct disk
+path such as `/mnt/cache/appdata/screamingfrog` over `/mnt/user/...`.
 
 ## Repository layout
 

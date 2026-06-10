@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/with-contenv bash
 # Applies the exit node once the user has authenticated. Authentication is
 # MANUAL by design — no auth keys are stored in container config or env vars:
 #   docker exec -it <container> tailscale up --exit-node=NODE

@@ -15,7 +15,7 @@ services:
       - TS_ENABLED=false       # read README "Tailscale" before enabling
       - TS_EXIT_NODE=
     ports:
-      - "3000:3000"            # GUI (KasmVNC, HTTP) — change the host side as you wish
+      - "3001:3001"            # GUI (HTTPS, self-signed cert) — change the host side as you wish
       - "11435:11436"          # MCP — change the host side as you wish
     volumes:
       - ./appdata:/config      # licence, configs, crawls, exports

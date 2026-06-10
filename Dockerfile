@@ -27,8 +27,10 @@ RUN apt-get update && \
 COPY root/ /
 RUN chmod +x /custom-cont-init.d/* /custom-services.d/*
 
-# 3000  = Webtop GUI (KasmVNC, HTTP)
+# 3001  = Webtop GUI (HTTPS, self-signed cert — the Selkies web client
+#         requires a secure context; port 3000 is plain HTTP and the client
+#         refuses to run over it except on localhost)
 # 11436 = MCP relay (socat -> 127.0.0.1:11435 inside the container)
 # Host port mappings are defined by the user (Unraid template / compose),
 # never hardcoded here.
-EXPOSE 3000 11436
+EXPOSE 3001 11436
