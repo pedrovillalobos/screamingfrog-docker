@@ -18,7 +18,14 @@ services:
       - "3001:3001"            # GUI (HTTPS, self-signed cert) — change the host side as you wish
       - "11435:11436"          # MCP — change the host side as you wish
     volumes:
+      # Put this on your fastest LOCAL disk (ideally NVMe) — the app is very
+      # sensitive to disk speed. On cloud servers, avoid network-attached
+      # volumes. See docs/STORAGE.md.
       - ./appdata:/config      # licence, configs, crawls, exports
+      # Fallback if /config can't live on the fast disk: map the database
+      # alone, then set File > Settings > Storage Mode > database location
+      # to /database in the app. See docs/STORAGE.md.
+      # - /path/on/fast/nvme/screamingfrog-db:/database
     shm_size: "2gb"            # required for JavaScript rendering
     security_opt:
       - seccomp=unconfined

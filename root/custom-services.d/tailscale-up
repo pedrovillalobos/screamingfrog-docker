@@ -13,6 +13,11 @@ while true; do
     STATE="$(tailscale status --json 2>/dev/null | grep -o '"BackendState": *"[^"]*"' | cut -d'"' -f4)"
     case "$STATE" in
         Running)
+            # Keep container DNS untouched: in userspace mode, accepting
+            # Tailscale DNS points resolv.conf at 100.100.100.100, which is
+            # unreachable without a TUN device. A manual `tailscale up` resets
+            # this preference, so re-apply it on every connect.
+            tailscale set --accept-dns=false 2>/dev/null || true
             # Re-apply the exit node in case the saved state predates an env change
             if [ -n "$TS_EXIT_NODE" ]; then
                 tailscale set --exit-node="$TS_EXIT_NODE" 2>/dev/null || true

@@ -47,8 +47,12 @@ Full documentation: https://github.com/pedrovillalobos/screamingfrog-docker
           Type="Port" Display="always" Required="true" Mask="false">11435</Config>
 
   <Config Name="Appdata" Target="/config" Default="/mnt/user/appdata/screamingfrog" Mode="rw"
-          Description="Licence, configs (.seospiderconfig), crawls, exports and MCP working directory. TIP: a direct disk path like /mnt/cache/appdata/screamingfrog (if your appdata lives on a cache pool) avoids Unraid's FUSE overhead and makes the app noticeably faster with its many small files."
+          Description="Licence, configs, crawls, exports and MCP working directory. Use a DIRECT path on your FASTEST pool, ideally NVMe (e.g. /mnt/nvme_pool/appdata/screamingfrog) — never /mnt/user/... The app is very sensitive to disk speed; on a slow disk it takes minutes to open and crawls run slower. Details: https://github.com/pedrovillalobos/screamingfrog-docker/blob/main/docs/STORAGE.md"
           Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/screamingfrog</Config>
+
+  <Config Name="Database directory (optional)" Target="/database" Default="" Mode="rw"
+          Description="FALLBACK if you cannot put the whole Appdata on your fast disk: map your NVMe here, then in the app set File &gt; Settings &gt; Storage Mode &gt; database location to /database (one-time). Details: https://github.com/pedrovillalobos/screamingfrog-docker/blob/main/docs/STORAGE.md"
+          Type="Path" Display="always" Required="false" Mask="false"></Config>
 
   <Config Name="SF_VERSION" Target="SF_VERSION" Default="24.1" Mode=""
           Description="MINIMUM Screaming Frog version to install. Raise it and restart to force an update; the in-app updater also works and is never downgraded."
