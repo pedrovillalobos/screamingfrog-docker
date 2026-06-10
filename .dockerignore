@@ -1,0 +1,12 @@
+.git
+.github
+.gitignore
+.dockerignore
+README.md
+LICENSE
+NOTICE
+unraid-template/
+docker-compose.yml
+icon.png
+appdata/
+*.zip

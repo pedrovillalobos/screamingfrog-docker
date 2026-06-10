@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Editors / IDEs
+.idea/
+.vscode/
+*.swp
+*~
+
+# Local runtime data (when using the compose example with ./appdata)
+appdata/
+
+# Env files with secrets
+.env
+.env.*
+
+# Node/Python leftovers (just in case)
+node_modules/
+__pycache__/
+
+# Build artifacts
+*.log
+*.zip

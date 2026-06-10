@@ -1,0 +1,16 @@
+#!/bin/bash
+# tailscaled in userspace-networking mode: no /dev/net/tun, no NET_ADMIN.
+# It exposes a local outbound HTTP proxy (port 1056) and SOCKS5 (1055) —
+# only traffic the SEO Spider sends through the proxy leaves via the
+# tailnet/exit node. GUI, MCP and LAN access are untouched (no asymmetric
+# routing on bridge networks). State persists in /config/tailscale.
+if [ "${TS_ENABLED,,}" != "true" ] || ! command -v tailscaled >/dev/null 2>&1; then
+    exec sleep infinity
+fi
+
+mkdir -p /config/tailscale
+exec tailscaled \
+    --state=/config/tailscale/tailscaled.state \
+    --tun=userspace-networking \
+    --socks5-server=localhost:1055 \
+    --outbound-http-proxy-listen=localhost:1056

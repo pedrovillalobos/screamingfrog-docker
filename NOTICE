@@ -1,0 +1,16 @@
+This is an UNOFFICIAL community project, not affiliated with, endorsed by, or
+supported by Screaming Frog Ltd.
+
+"Screaming Frog" and "SEO Spider" are trademarks of Screaming Frog Ltd.
+
+This container image does NOT bundle or redistribute the Screaming Frog SEO
+Spider software. The official installer is downloaded from
+screamingfrog.co.uk at container start, on the end user's own machine,
+pinned by the SF_VERSION environment variable.
+
+Use of the Screaming Frog SEO Spider is governed by the Screaming Frog EULA.
+A paid licence, purchased directly from Screaming Frog Ltd, is required for
+crawls over 500 URLs and for MCP/headless/saved-crawl features.
+
+The MIT licence in this repository covers only the packaging code (Dockerfile,
+shell scripts, templates and documentation), not the Screaming Frog software.

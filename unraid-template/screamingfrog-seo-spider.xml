@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>ScreamingFrog-SEO-Spider</Name>
+  <Repository>ghcr.io/pedrovillalobos/screamingfrog-docker:latest</Repository>
+  <Registry>https://github.com/pedrovillalobos/screamingfrog-docker/pkgs/container/screamingfrog-docker</Registry>
+  <Network>bridge</Network>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>URL_DA_THREAD_NO_FORUM_UNRAID</Support>
+  <Project>https://github.com/pedrovillalobos/screamingfrog-docker</Project>
+  <Overview>
+Screaming Frog SEO Spider (UNOFFICIAL) running in your browser via KasmVNC, with the native MCP server (v24+) exposed for Claude Code / Cursor / any MCP client, and optional Tailscale userspace egress so crawls exit through a fixed-IP exit node.
+
+A PAID SCREAMING FROG LICENCE IS REQUIRED for crawls over 500 URLs and for MCP/headless features. This image does NOT bundle Screaming Frog: the official installer is downloaded from screamingfrog.co.uk on first start, pinned by the SF_VERSION variable. Enter your licence once in the GUI — it persists in appdata.
+
+To update Screaming Frog: change SF_VERSION and restart the container. Licence, configs and crawls are preserved.
+
+MCP: enable it inside the app (Settings &gt; MCP Server, base directory /config/mcp-workdir), then on your client:
+claude mcp add --transport http screaming-frog http://SERVER_IP:11435/mcp
+
+Tailscale (optional, installed at runtime only if enabled): set TS_ENABLED=true. In the SEO Spider set Config &gt; System &gt; Proxy to localhost:1056 so crawl traffic exits via your exit node.
+
+Security: the GUI and MCP ports have no built-in authentication — keep them on your LAN/tailnet only, never expose them to the internet.
+  </Overview>
+  <Category>Tools: Productivity:</Category>
+  <WebUI>http://[IP]:[PORT:3000]/</WebUI>
+  <TemplateURL/>
+  <Icon>https://raw.githubusercontent.com/pedrovillalobos/screamingfrog-docker/main/icon.png</Icon>
+  <ExtraParams>--shm-size=2g --security-opt seccomp=unconfined</ExtraParams>
+  <DonateText/>
+  <DonateLink/>
+
+  <Config Name="WebUI (KasmVNC)" Target="3000" Default="3000" Mode="tcp"
+          Description="Screaming Frog GUI in the browser (HTTP)"
+          Type="Port" Display="always" Required="true" Mask="false">3000</Config>
+
+  <Config Name="MCP Server" Target="11436" Default="11435" Mode="tcp"
+          Description="Native SEO Spider MCP server (http://IP:port/mcp)"
+          Type="Port" Display="always" Required="true" Mask="false">11435</Config>
+
+  <Config Name="Appdata" Target="/config" Default="/mnt/user/appdata/screamingfrog" Mode="rw"
+          Description="Licence, configs (.seospiderconfig), crawls, exports and MCP working directory"
+          Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/screamingfrog</Config>
+
+  <Config Name="SF_VERSION" Target="SF_VERSION" Default="24.0" Mode=""
+          Description="Screaming Frog version to install. Change it and restart the container to update."
+          Type="Variable" Display="always" Required="true" Mask="false">24.0</Config>
+
+  <Config Name="SF_MAX_MEMORY" Target="SF_MAX_MEMORY" Default="" Mode=""
+          Description="Java heap allocation, e.g. 12g. Empty = controlled via the app GUI (File &gt; Settings &gt; Memory Allocation)."
+          Type="Variable" Display="always" Required="false" Mask="false"></Config>
+
+  <Config Name="TS_ENABLED" Target="TS_ENABLED" Default="false" Mode=""
+          Description="Installs and enables Tailscale at runtime (userspace outbound proxy for exit-node egress)"
+          Type="Variable" Display="always" Required="false" Mask="false">false</Config>
+
+  <Config Name="TS_AUTHKEY" Target="TS_AUTHKEY" Default="" Mode=""
+          Description="Tailscale auth key (optional; without it, authenticate once with: docker exec -it ScreamingFrog-SEO-Spider tailscale up)"
+          Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
+
+  <Config Name="TS_EXIT_NODE" Target="TS_EXIT_NODE" Default="" Mode=""
+          Description="Tailscale hostname/IP of the exit node used for crawl egress"
+          Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+
+  <Config Name="PUID" Target="PUID" Default="99" Mode=""
+          Description="" Type="Variable" Display="advanced" Required="false" Mask="false">99</Config>
+
+  <Config Name="PGID" Target="PGID" Default="100" Mode=""
+          Description="" Type="Variable" Display="advanced" Required="false" Mask="false">100</Config>
+
+  <Config Name="TZ" Target="TZ" Default="America/Sao_Paulo" Mode=""
+          Description="" Type="Variable" Display="advanced" Required="false" Mask="false">America/Sao_Paulo</Config>
+</Container>
