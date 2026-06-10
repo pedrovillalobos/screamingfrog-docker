@@ -85,7 +85,6 @@ services:
       - TITLE=Screaming Frog
       - SF_VERSION=24.1        # minimum version, see "Updating" below
       - TS_ENABLED=false       # see "Tailscale" below before enabling
-      - TS_AUTHKEY=
       - TS_EXIT_NODE=
     ports:
       - "3000:3000"            # GUI (KasmVNC, HTTP)
@@ -106,7 +105,6 @@ services:
 |---|---|---|
 | `SF_VERSION` | `24.1` | **Minimum** Screaming Frog version. Installs only if nothing is installed or the installed version is older — never reinstalls the same version, never downgrades. Raise it + restart to force an update. |
 | `TS_ENABLED` | `false` | Installs and starts Tailscale (userspace) at runtime. Read [Tailscale](#tailscale--fixed-ip-crawl-egress-optional) before enabling. |
-| `TS_AUTHKEY` | *(empty)* | Tailscale auth key. Without it, authenticate once: `docker exec -it screamingfrog tailscale up`. |
 | `TS_EXIT_NODE` | *(empty)* | Tailscale hostname/IP of the exit node for crawl egress. |
 | `PUID` / `PGID` | `99` / `100` | File ownership for `/config` (Unraid defaults shown; use `1000`/`1000` on most Linux distros). |
 | `TZ` | — | Timezone, e.g. `America/Sao_Paulo`. |
@@ -151,15 +149,27 @@ the exit node — everything else (GUI, MCP, LAN) is untouched. This is why it
 does not suffer from the asymmetric-routing problem that kernel-mode exit
 nodes cause on bridge networks.
 
-1. Set `TS_ENABLED=true` (plus `TS_AUTHKEY` and `TS_EXIT_NODE`, or authenticate
-   manually: `docker exec -it screamingfrog tailscale up --exit-node=NODE`).
-2. Verify the egress IP:
+Authentication is **manual by design** — this image deliberately does not
+accept Tailscale auth keys via environment variables, since env vars are
+visible in container inspect output, templates and logs. You log in once and
+the session persists in `/config/tailscale`.
+
+1. Set `TS_ENABLED=true` (and optionally `TS_EXIT_NODE` so the exit node is
+   re-applied automatically after container re-creations).
+2. Authenticate once:
+   ```
+   docker exec -it screamingfrog tailscale up --exit-node=NODE
+   ```
+   Open the printed URL in your browser to approve the device. Afterwards, in
+   the Tailscale admin console (Machines), consider enabling
+   "Disable key expiry" for this device so it never needs re-authentication.
+3. Verify the egress IP:
    ```
    docker exec screamingfrog curl -s -x http://localhost:1056 https://ifconfig.me
    ```
    It must return your exit node's public IP.
-3. In the SEO Spider: `Config > System > Proxy` → host `localhost`, port `1056`.
-4. Remote access over your tailnet: `http://TAILSCALE_IP:3000` (GUI) and
+4. In the SEO Spider: `Config > System > Proxy` → host `localhost`, port `1056`.
+5. Remote access over your tailnet: `http://TAILSCALE_IP:3000` (GUI) and
    `http://TAILSCALE_IP:11436/mcp` (MCP).
 
 State persists in `/config/tailscale`. Because Tailscale is installed at

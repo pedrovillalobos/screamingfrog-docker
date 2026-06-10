@@ -13,7 +13,6 @@ services:
       - TITLE=Screaming Frog
       - SF_VERSION=24.1        # minimum version (see README "Updating")
       - TS_ENABLED=false       # read README "Tailscale" before enabling
-      - TS_AUTHKEY=
       - TS_EXIT_NODE=
     ports:
       - "3000:3000"            # GUI (KasmVNC, HTTP) — change the host side as you wish

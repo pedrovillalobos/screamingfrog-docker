@@ -51,9 +51,6 @@ Security: the GUI and MCP ports have no built-in authentication — keep them on
           Description="Installs Tailscale at runtime (userspace) for fixed-IP crawl egress via an exit node. READ THE README BEFORE ENABLING: https://github.com/pedrovillalobos/screamingfrog-docker#tailscale--fixed-ip-crawl-egress-optional"
           Type="Variable" Display="always" Required="false" Mask="false">false</Config>
 
-  <Config Name="TS_AUTHKEY" Target="TS_AUTHKEY" Default="" Mode=""
-          Description="Tailscale auth key (optional; without it, authenticate once with: docker exec -it ScreamingFrog-SEO-Spider tailscale up). See README."
-          Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
 
   <Config Name="TS_EXIT_NODE" Target="TS_EXIT_NODE" Default="" Mode=""
           Description="Tailscale hostname/IP of the exit node used for crawl egress. See README."

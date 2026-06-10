@@ -1,30 +1,31 @@
 #!/bin/bash
-# Brings the Tailscale session up once the daemon is ready. If TS_AUTHKEY is
-# empty, authenticate manually once with:
-#   docker exec -it screamingfrog tailscale up [--exit-node=...]
-# State persists in /config/tailscale across container re-creations.
+# Applies the exit node once the user has authenticated. Authentication is
+# MANUAL by design — no auth keys are stored in container config or env vars:
+#   docker exec -it <container> tailscale up --exit-node=NODE
+# The session state persists in /config/tailscale, so login is needed only
+# once (and again only if you wipe that state directory).
 if [ "${TS_ENABLED,,}" != "true" ] || ! command -v tailscale >/dev/null 2>&1; then
     exec sleep infinity
 fi
 
 sleep 5
-while ! tailscale status --json >/dev/null 2>&1; do
-    if [ -n "$TS_AUTHKEY" ]; then
-        echo "[tailscale-up] Authenticating with auth key..."
-        tailscale up \
-            --authkey="$TS_AUTHKEY" \
-            ${TS_EXIT_NODE:+--exit-node="$TS_EXIT_NODE"} \
-            --accept-dns=false || true
-    else
-        echo "[tailscale-up] Waiting for manual login (TS_AUTHKEY is empty)."
-    fi
+while true; do
+    STATE="$(tailscale status --json 2>/dev/null | grep -o '"BackendState": *"[^"]*"' | cut -d'"' -f4)"
+    case "$STATE" in
+        Running)
+            # Re-apply the exit node in case the saved state predates an env change
+            if [ -n "$TS_EXIT_NODE" ]; then
+                tailscale set --exit-node="$TS_EXIT_NODE" 2>/dev/null || true
+            fi
+            echo "[tailscale-up] Connected. Outbound HTTP proxy: localhost:1056 (SOCKS5: 1055)."
+            exec sleep infinity
+            ;;
+        NeedsLogin|"")
+            echo "[tailscale-up] Waiting for manual login: docker exec -it <container> tailscale up"
+            ;;
+        *)
+            echo "[tailscale-up] Backend state: ${STATE}"
+            ;;
+    esac
     sleep 15
 done
-
-# Re-apply the exit node in case the saved state predates an env change
-if [ -n "$TS_EXIT_NODE" ]; then
-    tailscale set --exit-node="$TS_EXIT_NODE" 2>/dev/null || true
-fi
-
-echo "[tailscale-up] Connected. Outbound HTTP proxy: localhost:1056 (SOCKS5: 1055)."
-exec sleep infinity
