@@ -11,14 +11,15 @@
   <Overview>
 Screaming Frog SEO Spider (UNOFFICIAL) running in your browser via KasmVNC, with the native MCP server (v24+) exposed for Claude Code / Cursor / any MCP client, and optional Tailscale userspace egress so crawls exit through a fixed-IP exit node.
 
-A PAID SCREAMING FROG LICENCE IS REQUIRED for crawls over 500 URLs and for MCP/headless features. This image does NOT bundle Screaming Frog: the official installer is downloaded from screamingfrog.co.uk on first start, pinned by the SF_VERSION variable. Enter your licence once in the GUI — it persists in appdata.
+A PAID SCREAMING FROG LICENCE IS REQUIRED for crawls over 500 URLs and for MCP/headless features. This image does NOT bundle Screaming Frog: the official installer is downloaded from screamingfrog.co.uk on first start (SF_VERSION sets the minimum version). Enter your licence once in the GUI — it persists in appdata.
 
-To update Screaming Frog: change SF_VERSION and restart the container. Licence, configs and crawls are preserved.
+Memory allocation is set in the app (File &gt; Settings &gt; Memory Allocation) and persists in appdata.
 
 MCP: enable it inside the app (Settings &gt; MCP Server, base directory /config/mcp-workdir), then on your client:
 claude mcp add --transport http screaming-frog http://SERVER_IP:11435/mcp
 
-Tailscale (optional, installed at runtime only if enabled): set TS_ENABLED=true. In the SEO Spider set Config &gt; System &gt; Proxy to localhost:1056 so crawl traffic exits via your exit node.
+Tailscale (optional, installed at runtime only if enabled): set TS_ENABLED=true and read the README first: https://github.com/pedrovillalobos/screamingfrog-docker#tailscale--fixed-ip-crawl-egress-optional
+IMPORTANT: do NOT use Unraid's built-in per-container Tailscale toggle with an Exit Node on this container — it routes ALL replies through the exit node and breaks LAN access to the GUI and MCP. The TS_ENABLED variables route only crawl traffic through the exit node.
 
 Security: the GUI and MCP ports have no built-in authentication — keep them on your LAN/tailnet only, never expose them to the internet.
   </Overview>
@@ -39,27 +40,23 @@ Security: the GUI and MCP ports have no built-in authentication — keep them on
           Type="Port" Display="always" Required="true" Mask="false">11435</Config>
 
   <Config Name="Appdata" Target="/config" Default="/mnt/user/appdata/screamingfrog" Mode="rw"
-          Description="Licence, configs (.seospiderconfig), crawls, exports and MCP working directory"
+          Description="Licence, configs (.seospiderconfig), crawls, exports and MCP working directory. TIP: a direct disk path like /mnt/cache/appdata/screamingfrog (if your appdata lives on a cache pool) avoids Unraid's FUSE overhead and makes the app noticeably faster with its many small files."
           Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/screamingfrog</Config>
 
-  <Config Name="SF_VERSION" Target="SF_VERSION" Default="24.0" Mode=""
-          Description="Screaming Frog version to install. Change it and restart the container to update."
-          Type="Variable" Display="always" Required="true" Mask="false">24.0</Config>
-
-  <Config Name="SF_MAX_MEMORY" Target="SF_MAX_MEMORY" Default="" Mode=""
-          Description="Java heap allocation, e.g. 12g. Empty = controlled via the app GUI (File &gt; Settings &gt; Memory Allocation)."
-          Type="Variable" Display="always" Required="false" Mask="false"></Config>
+  <Config Name="SF_VERSION" Target="SF_VERSION" Default="24.1" Mode=""
+          Description="MINIMUM Screaming Frog version to install. Raise it and restart to force an update; the in-app updater also works and is never downgraded."
+          Type="Variable" Display="always" Required="true" Mask="false">24.1</Config>
 
   <Config Name="TS_ENABLED" Target="TS_ENABLED" Default="false" Mode=""
-          Description="Installs and enables Tailscale at runtime (userspace outbound proxy for exit-node egress)"
+          Description="Installs Tailscale at runtime (userspace) for fixed-IP crawl egress via an exit node. READ THE README BEFORE ENABLING: https://github.com/pedrovillalobos/screamingfrog-docker#tailscale--fixed-ip-crawl-egress-optional"
           Type="Variable" Display="always" Required="false" Mask="false">false</Config>
 
   <Config Name="TS_AUTHKEY" Target="TS_AUTHKEY" Default="" Mode=""
-          Description="Tailscale auth key (optional; without it, authenticate once with: docker exec -it ScreamingFrog-SEO-Spider tailscale up)"
+          Description="Tailscale auth key (optional; without it, authenticate once with: docker exec -it ScreamingFrog-SEO-Spider tailscale up). See README."
           Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
 
   <Config Name="TS_EXIT_NODE" Target="TS_EXIT_NODE" Default="" Mode=""
-          Description="Tailscale hostname/IP of the exit node used for crawl egress"
+          Description="Tailscale hostname/IP of the exit node used for crawl egress. See README."
           Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
 
   <Config Name="PUID" Target="PUID" Default="99" Mode=""

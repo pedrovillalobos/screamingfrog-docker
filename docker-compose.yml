@@ -11,9 +11,8 @@ services:
       - PGID=1000              # your group id (id -g)
       - TZ=Etc/UTC
       - TITLE=Screaming Frog
-      - SF_VERSION=24.0
-      - SF_MAX_MEMORY=         # e.g. 12g; empty = controlled via the app GUI
-      - TS_ENABLED=false
+      - SF_VERSION=24.1        # minimum version (see README "Updating")
+      - TS_ENABLED=false       # read README "Tailscale" before enabling
       - TS_AUTHKEY=
       - TS_EXIT_NODE=
     ports:
