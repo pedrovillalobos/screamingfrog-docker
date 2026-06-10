@@ -42,3 +42,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # Layer cache: pushes that only change scripts under root/ reuse the
+          # (slow, QEMU-emulated on arm64) apt layers instead of rebuilding them.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
