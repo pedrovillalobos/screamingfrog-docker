@@ -54,9 +54,9 @@ Full documentation: https://github.com/pedrovillalobos/screamingfrog-docker
           Description="FALLBACK if you cannot put the whole Appdata on your fast disk: map your NVMe here, then in the app set File &gt; Settings &gt; Storage Mode &gt; database location to /database (one-time). Details: https://github.com/pedrovillalobos/screamingfrog-docker/blob/main/docs/STORAGE.md"
           Type="Path" Display="always" Required="false" Mask="false"></Config>
 
-  <Config Name="SF_VERSION" Target="SF_VERSION" Default="24.1" Mode=""
+  <Config Name="SF_VERSION" Target="SF_VERSION" Default="24.3" Mode=""
           Description="MINIMUM Screaming Frog version to install. Raise it and restart to force an update; the in-app updater also works and is never downgraded."
-          Type="Variable" Display="always" Required="true" Mask="false">24.1</Config>
+          Type="Variable" Display="always" Required="true" Mask="false">24.3</Config>
 
   <Config Name="TS_ENABLED" Target="TS_ENABLED" Default="false" Mode=""
           Description="Installs Tailscale at runtime (userspace) for fixed-IP crawl egress via an exit node. READ THE README BEFORE ENABLING: https://github.com/pedrovillalobos/screamingfrog-docker#tailscale--fixed-ip-crawl-egress-optional"

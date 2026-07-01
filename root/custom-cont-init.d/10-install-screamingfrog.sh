@@ -15,7 +15,7 @@
 # when possible.
 set -e
 
-SF_VERSION="${SF_VERSION:-24.1}"
+SF_VERSION="${SF_VERSION:-24.3}"
 ARCH="$(dpkg --print-architecture)"   # amd64 or arm64
 CACHE="/config/installers"
 DEB="${CACHE}/screamingfrogseospider_${SF_VERSION}_${ARCH}.deb"

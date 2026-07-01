@@ -11,7 +11,7 @@ services:
       - PGID=1000              # your group id (id -g)
       - TZ=Etc/UTC
       - TITLE=Screaming Frog
-      - SF_VERSION=24.1        # minimum version (see README "Updating")
+      - SF_VERSION=24.3        # minimum version (see README "Updating")
       - TS_ENABLED=false       # read README "Tailscale" before enabling
       - TS_EXIT_NODE=
     ports:
