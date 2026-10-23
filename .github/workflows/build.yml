@@ -5,15 +5,65 @@ on:
     branches: [main]
     tags: ["v*"]
   schedule:
-    - cron: "0 4 * * 1"   # weekly rebuild to pick up webtop base patches
+    - cron: "0 4 * * 1"   # weekly check; rebuilds only if the webtop base changed
   workflow_dispatch:
 
 concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  BASE_IMAGE: lscr.io/linuxserver/webtop:ubuntu-xfce
+
 jobs:
+  # Resolves the current webtop base digest. On the weekly schedule, compares it
+  # with the digest recorded on the published :latest and skips the build when
+  # the base hasn't changed, so the cron doesn't publish identical images.
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    outputs:
+      base-digest: ${{ steps.base.outputs.digest }}
+      build: ${{ steps.compare.outputs.build }}
+    steps:
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: base
+        run: |
+          digest="sha256:$(docker buildx imagetools inspect --raw "$BASE_IMAGE" | sha256sum | cut -d' ' -f1)"
+          echo "Base $BASE_IMAGE is $digest"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+
+      - id: compare
+        env:
+          IMAGE: ghcr.io/${{ github.repository }}:latest
+          BASE_DIGEST: ${{ steps.base.outputs.digest }}
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "build=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          published=$(docker buildx imagetools inspect --raw "$IMAGE" 2>/dev/null \
+            | jq -r '.annotations["org.opencontainers.image.base.digest"] // empty' || true)
+          echo "Published :latest was built on: ${published:-unknown}"
+          if [ "$published" = "$BASE_DIGEST" ]; then
+            echo "Base image unchanged, skipping rebuild." >> "$GITHUB_STEP_SUMMARY"
+            echo "build=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
+    needs: check
+    if: needs.check.outputs.build == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -48,6 +98,13 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # Build from the exact base digest that was checked, and record it on
+          # the index so the next scheduled run can compare against it.
+          build-args: |
+            BASE_IMAGE=${{ env.BASE_IMAGE }}@${{ needs.check.outputs.base-digest }}
+          annotations: |
+            index:org.opencontainers.image.base.name=${{ env.BASE_IMAGE }}
+            index:org.opencontainers.image.base.digest=${{ needs.check.outputs.base-digest }}
           # Layer cache: pushes that only change scripts under root/ reuse the
           # (slow, QEMU-emulated on arm64) apt layers instead of rebuilding them.
           cache-from: type=gha
