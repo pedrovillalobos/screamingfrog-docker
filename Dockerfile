@@ -5,7 +5,8 @@
 # container start, on the user's own machine, pinned by the SF_VERSION env.
 # A paid licence (provided by the user) is required for crawls over 500 URLs
 # and for MCP/headless features. See NOTICE for trademark/EULA details.
-FROM lscr.io/linuxserver/webtop:ubuntu-xfce
+ARG BASE_IMAGE=lscr.io/linuxserver/webtop:ubuntu-xfce
+FROM ${BASE_IMAGE}
 
 LABEL org.opencontainers.image.source="https://github.com/pedrovillalobos/screamingfrog-docker" \
       org.opencontainers.image.title="Screaming Frog SEO Spider (unofficial)" \
