@@ -49,7 +49,7 @@ services:
       - PGID=1000              # your group id (id -g)
       - TZ=Etc/UTC
       - TITLE=Screaming Frog
-      - SF_VERSION=24.3        # minimum version, see "Updating" below
+      - SF_VERSION=25.1        # minimum version, see "Updating" below
       - TS_ENABLED=false       # see "Tailscale" below before enabling
       - TS_EXIT_NODE=
     ports:
@@ -69,7 +69,7 @@ services:
 
 | Variable | Default | Description |
 |---|---|---|
-| `SF_VERSION` | `24.3` | **Minimum** Screaming Frog version. Installs only if nothing is installed or the installed version is older — never reinstalls the same version, never downgrades. Raise it + restart to force an update. |
+| `SF_VERSION` | `25.1` | **Minimum** Screaming Frog version. Installs only if nothing is installed or the installed version is older — never reinstalls the same version, never downgrades. Raise it + restart to force an update. |
 | `TS_ENABLED` | `false` | Installs and starts Tailscale (userspace) at runtime. Read [Tailscale](#tailscale--fixed-ip-crawl-egress-optional) before enabling. |
 | `TS_EXIT_NODE` | *(empty)* | Tailscale hostname/IP of the exit node for crawl egress. |
 | `PUID` / `PGID` | `99` / `100` | File ownership for `/config` (Unraid defaults shown; use `1000`/`1000` on most Linux distros). |
@@ -125,7 +125,7 @@ State persists in `/config/tailscale`. Because Tailscale is installed at runtime
 
 `SF_VERSION` is a **minimum version**, and updates can happen two ways:
 
-- **Bump the variable**: set e.g. `SF_VERSION=24.2` and restart the container.
+- **Bump the variable**: set e.g. `SF_VERSION=25.1` and restart the container.
 - **In-app updater**: when the app offers a new version, accepting it works too — the init script never downgrades an installed version.
 
 Implementation detail worth knowing: the install lives in the container's writable layer, so it survives **restarts** but is redone after a **re-creation** (template edit, image update). The downloaded installer is cached in `/config/installers` to make that fast. Licence, configuration, crawls and exports in `/config` are never touched.
